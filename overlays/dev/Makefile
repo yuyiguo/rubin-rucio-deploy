@@ -1,12 +1,10 @@
 SERVER_CHART_VERSION := 32.0.0
 DAEMON_CHART_VERSION := 32.0.2
 UI_CHART_VERSION := 32.0.1
-ELASTIC_VERSION := 0.8.0
 
 helm:
 	helm repo add rucio https://rucio.github.io/helm-charts
-	helm repo add elastic https://helm.elastic.co
-	helm repo update rucio elastic
+	helm repo update rucio
 
 rucio-server: helm
 	helm template usdf rucio/rucio-server --version=${SERVER_CHART_VERSION} --values=rucio/values-rucio-server.yaml > rucio/helm-rucio-server.yaml
@@ -19,18 +17,12 @@ rucio-ui: helm
 
 rucio: rucio-server rucio-daemons rucio-ui
 
-elasticsearch:
-	helm template elasticsearch elastic/eck-elasticsearch --version=${ELASTIC_VERSION} --values=elastic/elasticsearch/values-elasticsearch.yaml > elastic/elasticsearch/helm-elasticsearch.yaml
-	vi elastic/elasticsearch/helm-elasticsearch.yaml -c ":%s/enterprise/basic/g" -c ":wq"
-
-elastic: elasticsearch
-
 get-secrets:
 	mkdir -p rucio/etc/.secrets
 	vault kv get --field=usdf-server-hostkey secret/rubin/usdf-rucio-dev/rucio  > rucio/etc/.secrets/hostkey.pem
 	vault kv get --field=usdf-server-hostcert secret/rubin/usdf-rucio-dev/rucio  > rucio/etc/.secrets/hostcert.pem
 	vault kv get --field=usdf-server-cafile secret/rubin/usdf-rucio-dev/rucio  > rucio/etc/.secrets/ca.pem
-	vault kv get --field=usdf-db-conn-str secret/rubin/usdf-rucio-dev/rucio  > rucio/etc/.secrets/db-conn-str.txt
+	vault kv get --field=usdf-db-16-conn-str secret/rubin/usdf-rucio-dev/rucio  > rucio/etc/.secrets/db-conn-str.txt
 	vault kv get --field=usdf-elasticsearch-password secret/rubin/usdf-rucio-dev/rucio  > rucio/etc/.secrets/usdf-elasticsearch-password
 	cp rucio/etc/automatix.json rucio/etc/.secrets/automatix.json
 	mkdir -p postgres/etc/.secrets
@@ -47,16 +39,16 @@ clean-secrets:
 run-dump: 
 	kubectl kustomize .
 
-dump: get-secrets rucio elastic run-dump clean-secrets 
+dump: get-secrets rucio run-dump clean-secrets 
 
 run-apply:  
 	kubectl apply -k .
 
-apply: get-secrets rucio elastic run-apply clean-secrets 
+apply: get-secrets rucio run-apply clean-secrets 
 
 run-destroy:
 	kubectl delete -k .
 
-destroy: get-secrets rucio elastic run-destroy clean-secrets 
+destroy: get-secrets rucio run-destroy clean-secrets 
 
 

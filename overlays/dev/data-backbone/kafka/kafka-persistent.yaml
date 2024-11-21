@@ -20,6 +20,8 @@ spec:
         port: 9094
         type: loadbalancer
         tls: false
+        #authentication:
+        #  type: scram-sha-512
         configuration:
           bootstrap:
             annotations:
@@ -47,7 +49,7 @@ spec:
       - id: 0
         type: persistent-claim
         class: wekafs--sdf-k8s01
-        size: 1Gi
+        size: 5Gi
         deleteClaim: false
   zookeeper:
     replicas: 3

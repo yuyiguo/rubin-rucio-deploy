@@ -22,6 +22,7 @@ spec:
         tls: false
         configuration:
           bootstrap:
+            loadBalancerIP: 134.79.23.189
             annotations:
               metallb.universe.tf/address-pool: sdf-dmz
           brokers:
@@ -47,7 +48,7 @@ spec:
       - id: 0
         type: persistent-claim
         class: wekafs--sdf-k8s01
-        size: 1Gi
+        size: 5Gi
         deleteClaim: false
   zookeeper:
     replicas: 3
