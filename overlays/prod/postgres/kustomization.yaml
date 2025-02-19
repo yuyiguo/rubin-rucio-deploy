@@ -2,8 +2,9 @@ namespace: rucio-db
 
 resources:
 - ns.yaml
-- cnpg-rucio-pooler.yaml
 - cnpg-rucio-database.yaml
+- cnpg-rucio-pooler.yaml
+#- cnpg-rucio-database.yaml
 
 secretGenerator:
 # database
